@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "WebRoot",
+			"path": "./docs"
+		},
+		{
+			"name": "DevRoot",
+			"path": "."
+		}
+	]
+}
