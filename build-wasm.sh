@@ -54,6 +54,14 @@ isDockerInstalled() {
     return $FALSE
 }
 
+isGitInstalled() {
+    if type git 2>/dev/null 1>/dev/null; then
+        return $TRUE
+    fi
+
+    return $FALSE
+}
+
 isGoInstalled() {
     if type go 2>/dev/null 1>/dev/null; then
         return $TRUE
@@ -212,6 +220,11 @@ isTinyGoInstalled && {
         exit $FAILURE
     }
     echo 'OK'
+
+    isGitInstalled || {
+        apt-get update && apt-get install -y git && \
+        git --version
+    }
 }
 
 # -----------------------------------------------------------------------------
@@ -221,21 +234,23 @@ isTinyGoInstalled && {
 TAG_APP=$(git describe --tag 2>/dev/null)
 REV_APP=$(git rev-parse --short HEAD)
 VER_APP=""
-if [ "${TAG_APP:+undefined}" ]; then
-    VER_APP="${TAG_APP}-${REV_APP}"
-fi
 
 # Build with TinyGo compiler
 isTinyGoInstalled && {
     NAME_COMPILER="TinyGo v$(tinygo version | grep -o -E "([0-9]+\.){1}[0-9]+(\.[0-9]+)?" | head -n1)"
+    if [ "${TAG_APP:+undefined}" ]; then
+        VER_APP="${TAG_APP}-${REV_APP} (Compiler: ${NAME_COMPILER})"
+    fi
+    LdFlags="-X \"main.versionApp=${VER_APP}\""
+
     printf "%s" "- Building wasm with TinyGo ... "
     result=$(
         GOOS=js GOARCH=wasm \
             tinygo build \
             -o "${PATH_FILE_OUT_WASM}" \
             -target=wasm \
-            -ldflags="-X 'main.versionApp=${VER_APP}' -X 'main.compilerApp=${NAME_COMPILER}'" \
-            --no-debug "${PATH_DIR_SRC_MAIN}/" 2>&1
+            -ldflags="${LdFlags}" \
+            "${PATH_DIR_SRC_MAIN}/" 2>&1
     ) || {
         echo 'NG (failed to build wasm binary)'
         echo "$result"
@@ -249,12 +264,17 @@ isTinyGoInstalled && {
 
 # Build with usual Go compiler
 NAME_COMPILER="Go v$(go version | grep -o -E "([0-9]+\.){1}[0-9]+(\.[0-9]+)?" | head -n1)"
+if [ "${TAG_APP:+undefined}" ]; then
+    VER_APP="${TAG_APP}-${REV_APP} (Compiler: ${NAME_COMPILER})"
+fi
+LdFlags="-X \"main.versionApp=${VER_APP}\""
+
 printf "%s" "- Building wasm with Go ... "
 result=$(
     GOOS=js GOARCH=wasm \
         go build \
         -o "${PATH_FILE_OUT_WASM}" \
-        -ldflags="-s -w -X 'main.versionApp=${VER_APP}' -X 'main.compilerApp=${NAME_COMPILER}'" \
+        -ldflags "-s -w ${LdFlags}" \
         "${PATH_DIR_SRC_MAIN}/" 2>&1
 ) || {
     echo 'NG (failed to build wasm binary)'
