@@ -5,7 +5,6 @@ package main
 import (
 	"KEINOS/SampleWasm/utils"
 	"bytes"
-	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -37,21 +36,14 @@ func registCallbacks() {
 // GoGetVersionApp returns the version info of the app.
 func GoGetVersionApp(_ js.Value, args []js.Value) interface{} {
 	const (
-		verAppDefault      = "dev"
-		compilerAppDefault = "unknown"
+		versionAppDefault = "dev (Compiler: unknown)"
 	)
 
 	if versionApp == "" {
-		versionApp = verAppDefault
-	}
-	if compilerApp == "" {
-		compilerApp = compilerAppDefault
+		versionApp = versionAppDefault
 	}
 
-	// Format version info
-	result := fmt.Sprintf("%s (Compiler: %s)", versionApp, compilerApp)
-
-	return js.ValueOf(result)
+	return js.ValueOf(versionApp)
 }
 
 // GoPong returns "pong" if the "args" contain "ping".

@@ -6,10 +6,7 @@ import (
 	"fmt"
 )
 
-var (
-	versionApp  string
-	compilerApp string
-)
+var versionApp string
 
 func main() {
 	// This prints to the browser's console in the dev tool

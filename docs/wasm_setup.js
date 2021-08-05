@@ -14,15 +14,16 @@ if (!WebAssembly.instantiateStreaming) { // polyfill
 WebAssembly.instantiateStreaming(fetch("test.wasm"), go.importObject).then((result) => {
     mod = result.module;
     inst = result.instance;
+
     runGoWasm();
-    enableElements();
+    enableElements(); // wasm is ready
 }).catch((err) => {
     console.error(err);
 });
 
 async function runGoWasm() {
     console.log("runGoWasm was called")
-    //console.clear();
+
     await go.run(inst);
 
     inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance

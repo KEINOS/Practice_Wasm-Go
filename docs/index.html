@@ -23,8 +23,14 @@
 </head>
 
 <body>
-	<div>App Ver: <span id="idVerAppWasm">please wait ...</span>	</div>
-	<div id="idStatus">Status: <span>please wait ...</span></div>
+	<div id="idVerApp">
+		App Ver: <span>please wait ...</span>
+	</div>
+
+	<div id="idStatus">
+		Status: <span>please wait ...</span>
+	</div>
+
 	<div id="idPing">
 		<button id="runPing" onClick="ping();" disabled>Ping</button>
 		<span id="resPong"></span>
@@ -50,18 +56,14 @@
 </body>
 
 <script>
+	// enable elements when wasm is ready
 	function enableElements() {
 		document.getElementById("runParrotry").disabled = false;
 		document.getElementById("runPing").disabled = false;
 		document.getElementById("idInputParrotry").disabled = false;
 		document.getElementById("idImgInput").disabled = false;
+		document.getElementById("idVerApp").firstElementChild.innerText = GoGetVersionApp() // Request wasm
 		document.getElementById("idStatus").firstElementChild.innerText = "Ready. Wasm is up."
-
-		getVersionWasm()
-	}
-
-	function getVersionWasm() {
-		document.getElementById("idVerAppWasm").innerText = GoGetVersionApp()
 	}
 
 	function parrotry() {
@@ -86,7 +88,7 @@
 <!-- polyfill for Microsoft Edge 17/18 support -->
 <script src="https://cdn.jsdelivr.net/npm/text-encoding@0.7.0/lib/encoding.min.js"></script>
 
-<!-- Detect 3 most common colors from an image -->
+<!-- Listen image upload and detect 3 most common colors from an image -->
 <script src="getCommonColors.js"></script>
 
 <!-- WebAssembling -->
